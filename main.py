@@ -46,10 +46,10 @@ def getPageData():
                                 "lat" : lat_lng[0],
                                 "lng" : lat_lng[1]
                             },
-                            "full_address": cell.text
+                            "full_address": str(cell.text).strip()
                         }
                     else:
-                        line[HEADERS[y]] = cell.text
+                        line[HEADERS[y]] = str(cell.text).strip()
                     y+=1
                 data.append(line)
                 n+=1
