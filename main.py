@@ -20,8 +20,7 @@ def getPageData():
             url,
             headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"},
             timeout=2900
-        )
-        print(response)
+        )        
         soup = BeautifulSoup(response.text, "html.parser")
         rows = soup.select("table tbody tr")
         HEADERS = ["nro", "date", "address", "type", "state", "machine", "map"]
@@ -35,16 +34,24 @@ def getPageData():
                 y=0    
                 for cell in cells:               
                     if HEADERS[y] == 'address':
-                        coordenadas = re.findall(r"\(([^)]+)\)", cell.text)
-                        if coordenadas and len(coordenadas[0].split(',')) == 2:
-                            lat_lng = [float(x) for x in coordenadas[0].split(',')]
-                        else:
-                            lat_lng = [0.0, 0.0]
+                        parens = re.findall(r"\(([^)]+)\)", cell.text)
+                        # lat_lng = [float(x) for x in parens[0].split(',')]
+                        lat_lng = [None, None]
+                        for p in parens:
+                            partes = p.split(',')                           
+                            if len(partes) == 2:
+                                try:
+                                    lat = float(partes[0])
+                                    lng = float(partes[1])
+                                    lat_lng = [lat, lng]
+                                    break  # Solo toma la primera válida
+                                except ValueError:
+                                    continue                        
 
                         line[HEADERS[y]] = {
                             "coords": {
-                                "lat" : lat_lng[0],
-                                "lng" : lat_lng[1]
+                                "lat" : None if lat_lng[0] == 0.0 else lat_lng[0],
+                                "lng" : None if lat_lng[1] == 0.0 else lat_lng[1]
                             },
                             "full_address": str(cell.text).strip()
                         }
