@@ -111,11 +111,6 @@ def get_data():
         return 'Hello world'
     elif request.method == "POST" and request_header == secure:
 
-        data = request.get_json(force=True)
-
-        get_state = data.get('state')
-        get_district = data.get('city')
-
         ff_list = r.get('firefighter-list')
         data = {}
 
@@ -128,23 +123,30 @@ def get_data():
             data = resultado
         else:
             data = json.loads(ff_list)
-        if get_district is not None:
-            incident_list = data.get('incidents')
-            incident_filter = []
-            for item in incident_list:
-                district_name = item.get('address').get('city')
-                if district_name is not None and str(district_name).lower() == str(get_district).lower():
-                    incident_filter.append(item)
-            data['incidents'] = incident_filter
 
-        if get_state is not None:
-            incident_list = data.get('incidents')
-            incident_filter = []
-            for item in incident_list:
-                state_name = item.get('state')
-                if state_name is not None and str(state_name).lower() == str(get_state).lower():
-                    incident_filter.append(item)
-            data['incidents'] = incident_filter
+        get_request = request.get_json(force=True, silent=True)
+
+        if get_request is not None:
+            get_state = get_request.get('state')
+            get_district = get_request.get('city')
+
+            if get_district is not None:
+                incident_list = data.get('incidents')
+                incident_filter = []
+                for item in incident_list:
+                    district_name = item.get('address').get('city')
+                    if district_name is not None and str(district_name).lower() == str(get_district).lower():
+                        incident_filter.append(item)
+                data['incidents'] = incident_filter
+
+            if get_state is not None:
+                incident_list = data.get('incidents')
+                incident_filter = []
+                for item in incident_list:
+                    state_name = item.get('state')
+                    if state_name is not None and str(state_name).lower() == str(get_state).lower():
+                        incident_filter.append(item)
+                data['incidents'] = incident_filter
 
         return jsonify(data)
     else:
