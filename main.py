@@ -107,7 +107,7 @@ def get_data():
         return 'Hello world'
     elif request.method == "POST" and request_header == secure:
 
-        data = request.json
+        data = request.get_json(force=True)
 
         get_state = data.get('state')
         get_district = data.get('city')
