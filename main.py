@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, Response
+from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 import redis
@@ -15,6 +16,9 @@ redis_decode = os.getenv('REDIS_DECODE')
 redis_username = os.getenv('REDIS_USERNAME')
 redis_password = os.getenv('REDIS_PASSWORD')
 
+app_origins = os.getenv('APP_ORIGINS')
+app_origins = app_origins.split(",")
+
 debug = os.getenv('DEBUG')
 url = os.getenv('URL')
 secure = os.getenv('SECURE')
@@ -26,6 +30,8 @@ r = redis.Redis(host=redis_host,
     password=redis_password)
 
 app = Flask(__name__)
+CORS(app)
+CORS(app, origins=app_origins)
 
 def getPageData():
     try:
