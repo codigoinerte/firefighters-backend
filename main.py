@@ -41,6 +41,7 @@ def getPageData():
             timeout=3200
         )
         cities = []
+        states = []
         soup = BeautifulSoup(response.text, "html.parser")
         rows = soup.select("table tbody tr")
         headers = ["nro", "date", "address", "type", "state", "machine", "map"]
@@ -81,12 +82,15 @@ def getPageData():
                         }
                         line[headers[y]] = address
                     else:
-                        line[headers[y]] = str(cell.text).strip()
+                        state = str(cell.text).strip()
+                        if headers[y] == 'state':
+                            states.append(str(state).lower())
+                        line[headers[y]] = state
                     y+=1
                 if line.get("address").get("coords").get("lat") is not None and line.get("address").get("coords").get("lng") is not None:
                     data.append(line)
                     n+=1
-        return { "incidents": data, "cities": list(set(cities))}
+        return { "incidents": data, "cities": list(set(cities)), "states": list(set(states)) }
 
     except Exception as e:
         print(e)
