@@ -19,6 +19,9 @@ redis_password = os.getenv('REDIS_PASSWORD')
 app_origins = os.getenv('APP_ORIGINS')
 app_origins = app_origins.split(",")
 
+remote_url = os.getenv('REMOTE_URL')
+remote_secure = os.getenv('REMOTE_SECURE')
+
 debug = os.getenv('DEBUG')
 url = os.getenv('URL')
 secure = os.getenv('SECURE')
@@ -33,6 +36,21 @@ app = Flask(__name__)
 CORS(app)
 CORS(app, origins=app_origins)
 
+def get_boundary(district):
+    try:
+        path = remote_url + "district-boundary"
+        headers = {"bind-secure":remote_secure}
+        json_data = {"district": district}
+        response = requests.post(url=path, headers=headers, json=json_data)
+        data = response.json()
+        if data is not None:
+            return data
+        else:
+            return []
+    except Exception as e:
+        print(e)
+        return []
+    
 def getPageData():
     try:
         response = requests.get(
@@ -90,7 +108,8 @@ def getPageData():
                 if line.get("address").get("coords").get("lat") is not None and line.get("address").get("coords").get("lng") is not None:
                     data.append(line)
                     n+=1
-        return { "incidents": data, "cities": list(set(cities)), "states": list(set(states)) }
+        cities = list(set(cities))
+        return { "incidents": data, "cities": cities, "states": list(set(states)) }
 
     except Exception as e:
         print(e)
@@ -101,7 +120,15 @@ def getPageData():
 def home():
     if request.method == "GET":
         return 'Home'
-    
+@app.route('/boundary', methods=['POST'])
+def boundary():
+    request_header = request.headers.get('secure')
+    if request.method == "POST" and request_header == secure:
+        district = r.get('district')
+        boundary_data = get_boundary(district=district)
+        return jsonify(boundary_data)
+    else:
+        return Response('Acceso prohibido', status=403)
 @app.route('/data', methods=['GET', 'POST'])
 def get_data():
 
