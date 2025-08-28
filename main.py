@@ -42,13 +42,18 @@ def get_boundary(district):
         headers = {"bind-secure":remote_secure}
         json_data = {"district": district}
         response = requests.post(url=path, headers=headers, json=json_data)
-        data = response.json()
-        if data is not None:
-            return data
+        # Verifica si la respuesta tiene contenido y es JSON
+        if response.headers.get('Content-Type', '').startswith('application/json'):
+            data = response.json()
+            if data is not None:
+                return data
+            else:
+                return []
         else:
-            return []
+            print(f"Respuesta no es JSON: {response.text}")
+            return []        
     except Exception as e:
-        print(e)
+        print(f"error = {e}")        
         return []
     
 def getPageData():
@@ -126,7 +131,6 @@ def boundary():
     if request.method == "POST" and request_header == secure:
         req_json = request.get_json(force=True, silent=True)
         district = req_json.get('district') if req_json else None
-
         boundary_data = get_boundary(district=district)
         return jsonify(boundary_data)
     else:
