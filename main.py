@@ -124,7 +124,9 @@ def home():
 def boundary():
     request_header = request.headers.get('secure')
     if request.method == "POST" and request_header == secure:
-        district = r.get('district')
+        req_json = request.get_json(force=True, silent=True)
+        district = req_json.get('district') if req_json else None
+
         boundary_data = get_boundary(district=district)
         return jsonify(boundary_data)
     else:
