@@ -82,7 +82,18 @@ def get_boundary(district):
                                 FROM `districts` 
                                 WHERE province = 'Lima' AND district = %s""", [district])
                 tables = cursor.fetchall()
-                return tables
+                response = tables[0]
+                return{
+                    "data":
+                    {
+                        "coordinates": json.loads(response["coordinates"]),
+                        "department": response["department"],
+                        "district": response["district"],
+                        "id": response["id"],
+                        "province": response["province"],
+                        "ubigeo": response["ubigeo"],
+                    }
+                }
 
     except pymysql.Error as db_error:
         print(f"Error de base de datos: {db_error}")
