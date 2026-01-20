@@ -1,3 +1,5 @@
 *_bkp*
 env
 .env
+
+/mariadb_data/
