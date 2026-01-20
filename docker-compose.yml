@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  mysql-db:
+    image: mariadb:11.4
+    container_name: mariadb-compose
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_USER_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
